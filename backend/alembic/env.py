@@ -7,10 +7,7 @@ from sqlalchemy import engine_from_config, pool
 
 from app.core.config import get_settings
 from app.db.base import Base
-
-# Import models here so that they are registered on Base.metadata
-# before autogenerate runs. Add imports as new models are created.
-# from app import models  # noqa: F401
+import app.models  # noqa: F401  (registers all models on Base.metadata)
 
 config = context.config
 config.set_main_option("sqlalchemy.url", get_settings().database_url)
