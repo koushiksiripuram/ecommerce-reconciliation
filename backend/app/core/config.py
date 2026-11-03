@@ -2,8 +2,15 @@
 
 from functools import lru_cache
 
-from pydantic import Field
+from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+# Placeholder used only for local development. Any non-development environment
+# must provide a real JWT_SECRET_KEY, which `Settings` enforces below.
+INSECURE_JWT_SECRET = "dev-insecure-secret-change-me-not-for-production"
+
+# Environments where the placeholder secret is tolerated.
+NON_PRODUCTION_ENVIRONMENTS = {"development", "local", "test"}
 
 
 class Settings(BaseSettings):
@@ -38,6 +45,35 @@ class Settings(BaseSettings):
     postgres_user: str = "postgres"
     postgres_password: str = "postgres"
     postgres_db: str = "reconciliation"
+
+    # Authentication / JWT
+    #
+    # The secret is never hardcoded: it must be supplied through the
+    # environment. The placeholder default keeps local development and the test
+    # suite runnable, and is rejected outside development (see `_check_secret`).
+    jwt_secret_key: str = INSECURE_JWT_SECRET
+    jwt_algorithm: str = "HS256"
+    jwt_access_token_expire_minutes: int = 60
+
+    # The access token is delivered as an HttpOnly cookie so browser JavaScript
+    # can never read it. Cookies are only sent cross-site when secure=True and
+    # SameSite="none", so both are configurable per environment.
+    auth_cookie_name: str = "access_token"
+    auth_cookie_secure: bool = False
+    auth_cookie_samesite: str = "lax"
+
+    @model_validator(mode="after")
+    def _check_secret(self) -> "Settings":
+        """Refuse to start outside development with the placeholder secret."""
+        if (
+            self.jwt_secret_key == INSECURE_JWT_SECRET
+            and self.environment.lower() not in NON_PRODUCTION_ENVIRONMENTS
+        ):
+            raise ValueError(
+                "JWT_SECRET_KEY must be set to a strong, unique value when "
+                f"ENVIRONMENT is {self.environment!r}."
+            )
+        return self
 
     @property
     def database_url(self) -> str:

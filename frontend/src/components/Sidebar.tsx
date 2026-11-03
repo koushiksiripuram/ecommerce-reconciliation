@@ -1,12 +1,16 @@
+import type { CurrentUser } from '../api/client'
+import { formatRole } from '../config/roles'
 import type { NavItem } from '../config/navigation'
 
 interface SidebarProps {
   items: NavItem[]
   activeId: string
   onSelect: (id: string) => void
+  user: CurrentUser
+  onSignOut: () => void
 }
 
-export function Sidebar({ items, activeId, onSelect }: SidebarProps) {
+export function Sidebar({ items, activeId, onSelect, user, onSignOut }: SidebarProps) {
   return (
     <aside className="sidebar">
       <div className="sidebar__brand">
@@ -30,6 +34,16 @@ export function Sidebar({ items, activeId, onSelect }: SidebarProps) {
           )
         })}
       </nav>
+
+      <div className="sidebar__footer">
+        <div className="sidebar__user">
+          <span className="sidebar__user-name">{user.full_name}</span>
+          <span className="sidebar__user-role">{formatRole(user.role.name)}</span>
+        </div>
+        <button type="button" className="sidebar__signout" onClick={onSignOut}>
+          Sign out
+        </button>
+      </div>
     </aside>
   )
 }

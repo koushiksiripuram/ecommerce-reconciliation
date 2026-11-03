@@ -29,8 +29,8 @@ class Role(Base, TimestampMixin):
 class User(Base, TimestampMixin):
     """A platform user belonging to exactly one role.
 
-    Credential storage is intentionally omitted: authentication is out of scope
-    for this milestone.
+    ``password_hash`` stores an Argon2id digest. Plaintext passwords are never
+    persisted, and the hash is excluded from every API schema.
     """
 
     __tablename__ = "users"
@@ -38,6 +38,7 @@ class User(Base, TimestampMixin):
     id: Mapped[int] = mapped_column(primary_key=True)
     email: Mapped[str] = mapped_column(String(255), nullable=False, unique=True, index=True)
     full_name: Mapped[str] = mapped_column(String(255), nullable=False)
+    password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     role_id: Mapped[int] = mapped_column(
         ForeignKey("roles.id", ondelete="RESTRICT"), nullable=False, index=True
     )

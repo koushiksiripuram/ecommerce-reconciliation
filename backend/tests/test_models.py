@@ -170,7 +170,12 @@ def test_enum_columns_store_lowercase_values_with_check_constraints() -> None:
 
 def _build_graph(session: Session) -> tuple[Order, SettlementRecord, ReconciliationResult, User]:
     role = Role(name="finance_executive", description="Handles reconciliation")
-    user = User(email="finance@example.com", full_name="Finance Executive", role=role)
+    user = User(
+        email="finance@example.com",
+        full_name="Finance Executive",
+        password_hash="test-password-hash",
+        role=role,
+    )
 
     order = Order(
         external_order_id="AMZ-1001",
@@ -254,7 +259,12 @@ def test_orm_round_trip_persists_and_links_entities(session: Session) -> None:
 
 def test_server_defaults_are_applied_on_insert(session: Session) -> None:
     role = Role(name="co_founder")
-    user = User(email="founder@example.com", full_name="Co Founder", role=role)
+    user = User(
+        email="founder@example.com",
+        full_name="Co Founder",
+        password_hash="test-password-hash",
+        role=role,
+    )
     session.add(user)
     session.commit()
 

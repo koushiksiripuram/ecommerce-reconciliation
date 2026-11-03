@@ -1,6 +1,7 @@
 """Tests for environment-driven configuration."""
 
 import pytest
+from pydantic import ValidationError
 
 from app.core.config import Settings, get_settings
 
@@ -56,3 +57,49 @@ def test_cors_origins_parses_json_array(monkeypatch: pytest.MonkeyPatch) -> None
     settings = Settings(_env_file=None)
 
     assert settings.cors_origins == ["https://app.example.com", "http://localhost:3000"]
+
+
+def test_auth_defaults_are_present() -> None:
+    settings = Settings(_env_file=None)
+
+    assert settings.jwt_algorithm == "HS256"
+    assert settings.jwt_access_token_expire_minutes == 60
+    assert settings.auth_cookie_name == "access_token"
+    assert settings.auth_cookie_secure is False
+    assert settings.auth_cookie_samesite == "lax"
+
+
+def test_jwt_settings_are_read_from_the_environment(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("JWT_SECRET_KEY", "env-provided-secret")
+    monkeypatch.setenv("JWT_ALGORITHM", "HS512")
+    monkeypatch.setenv("JWT_ACCESS_TOKEN_EXPIRE_MINUTES", "15")
+    monkeypatch.setenv("AUTH_COOKIE_SECURE", "true")
+    monkeypatch.setenv("AUTH_COOKIE_SAMESITE", "none")
+
+    settings = Settings(_env_file=None)
+
+    assert settings.jwt_secret_key == "env-provided-secret"
+    assert settings.jwt_algorithm == "HS512"
+    assert settings.jwt_access_token_expire_minutes == 15
+    assert settings.auth_cookie_secure is True
+    assert settings.auth_cookie_samesite == "none"
+
+
+def test_placeholder_jwt_secret_is_rejected_outside_development(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("ENVIRONMENT", "production")
+
+    with pytest.raises(ValidationError):
+        Settings(_env_file=None)
+
+
+def test_real_jwt_secret_is_accepted_outside_development(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("ENVIRONMENT", "production")
+    monkeypatch.setenv("JWT_SECRET_KEY", "a-long-random-production-secret")
+
+    settings = Settings(_env_file=None)
+
+    assert settings.jwt_secret_key == "a-long-random-production-secret"

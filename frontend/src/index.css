@@ -97,6 +97,161 @@ body {
   font-weight: 600;
 }
 
+.sidebar__footer {
+  /* Pushed to the bottom because .sidebar is a column flex container. */
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 12px 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.sidebar__user {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.sidebar__user-name {
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sidebar__user-role {
+  color: var(--color-sidebar-text);
+  font-size: 12px;
+}
+
+.sidebar__signout {
+  padding: 8px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-sidebar-text);
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.sidebar__signout:hover {
+  background-color: rgba(255, 255, 255, 0.06);
+  color: #fff;
+}
+
+/* Buttons ---------------------------------------------------------------- */
+
+.button {
+  padding: 10px 16px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.button--primary {
+  background-color: var(--color-accent);
+  color: #fff;
+}
+
+.button--primary:hover:not(:disabled) {
+  background-color: #2a62d4;
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Login screen ----------------------------------------------------------- */
+
+.auth-screen {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  padding: 24px;
+}
+
+.auth-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  max-width: 360px;
+  padding: 28px 26px;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+}
+
+.auth-card__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.auth-card__brand-text {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.auth-card__title {
+  margin: 4px 0 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.auth-card__subtitle {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+.auth-card__error {
+  margin: 0;
+  padding: 9px 12px;
+  border-radius: 8px;
+  background-color: #fdeaea;
+  color: #b3261e;
+  font-size: 13px;
+}
+
+/* Form fields ------------------------------------------------------------ */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.field__label {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.field__input {
+  padding: 9px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background-color: #fff;
+  color: inherit;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.field__input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(47, 111, 237, 0.15);
+}
+
 /* Main content ----------------------------------------------------------- */
 
 .app-main {
