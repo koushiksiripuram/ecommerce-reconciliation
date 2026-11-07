@@ -45,6 +45,12 @@ class SettlementRecord(Base, TimestampMixin):
 
     marketplace: Mapped[str] = mapped_column(String(64), nullable=False)
     external_reference: Mapped[str] = mapped_column(String(128), nullable=False)
+    #: The marketplace order id this line settles, when the file carries one.
+    #: It is the join key used to match a settlement back to an order; unlike
+    #: ``external_reference`` it does not have to be unique.
+    order_reference: Mapped[str | None] = mapped_column(
+        String(128), nullable=True, index=True
+    )
 
     order_id: Mapped[int | None] = mapped_column(
         ForeignKey("orders.id", ondelete="SET NULL"), nullable=True, index=True

@@ -2,9 +2,10 @@
 
 from fastapi import APIRouter
 
-from app.api.routes import auth, health, imports
+from app.api.routes import auth, health, imports, reconciliation
 
 api_router = APIRouter()
 api_router.include_router(health.router)
 api_router.include_router(auth.router)
 api_router.include_router(imports.router)
+api_router.include_router(reconciliation.router)

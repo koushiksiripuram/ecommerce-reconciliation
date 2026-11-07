@@ -40,6 +40,8 @@ EXPECTED_TABLES = {
     "raw_imported_records",
     "settlement_records",
     "reconciliation_results",
+    "reconciliation_runs",
+    "freight_rate_cards",
 }
 
 TABLES_WITH_UPDATED_AT = EXPECTED_TABLES - {"raw_imported_records"}
@@ -88,8 +90,8 @@ def test_monetary_columns_use_numeric_14_2() -> None:
                 assert isinstance(column.type, Numeric), f"{table.name}.{column.name}"
                 assert (column.type.precision, column.type.scale) == (14, 2)
                 checked += 1
-    # orders(5) + settlement_records(4) + reconciliation_results(3)
-    assert checked == 12
+    # orders(5) + settlement_records(4) + reconciliation_results(7)
+    assert checked == 16
 
 
 def test_timestamp_columns_are_present() -> None:
@@ -224,7 +226,7 @@ def _build_graph(session: Session) -> tuple[Order, SettlementRecord, Reconciliat
         order=order,
         settlement_record=settlement,
         import_batch=batch,
-        status=ReconciliationStatus.MATCHED,
+        status=ReconciliationStatus.SETTLED,
         expected_amount=Decimal("90.00"),
         actual_amount=Decimal("90.00"),
         difference_amount=Decimal("0.00"),
@@ -251,7 +253,7 @@ def test_orm_round_trip_persists_and_links_entities(session: Session) -> None:
     assert [record.external_reference for record in reloaded.settlement_records] == ["STL-9001"]
     assert reloaded.settlement_records[0].order.id == order_id
     assert [item.status for item in reloaded.reconciliation_results] == [
-        ReconciliationStatus.MATCHED
+        ReconciliationStatus.SETTLED
     ]
 
     assert settlement.raw_record.raw_data == {"order_id": "AMZ-1001", "amount": "90.00"}

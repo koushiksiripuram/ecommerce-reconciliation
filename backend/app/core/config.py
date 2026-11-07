@@ -1,5 +1,6 @@
 """Application configuration loaded from environment variables."""
 
+from decimal import Decimal
 from functools import lru_cache
 from pathlib import Path
 
@@ -73,6 +74,17 @@ class Settings(BaseSettings):
     import_preview_rows: int = 20
     #: Rows written per database round trip while processing an import.
     import_batch_size: int = 500
+
+    # Reconciliation
+    #
+    #: Amounts within this many rupees of each other are treated as equal, so a
+    #: rounding difference does not raise a short-payment flag.
+    reconciliation_amount_tolerance: Decimal = Decimal("1.00")
+    #: A freight charge exceeding the rate-card amount by more than this is
+    #: reported as an overcharge.
+    freight_overcharge_tolerance: Decimal = Decimal("10.00")
+    #: Days after the order date before an unpaid order is considered overdue.
+    unpaid_past_due_days: int = 15
 
     @model_validator(mode="after")
     def _check_secret(self) -> "Settings":

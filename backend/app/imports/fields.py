@@ -252,6 +252,56 @@ CANONICAL_FIELDS: tuple[CanonicalField, ...] = (
             "rto status",
         ),
     ),
+    CanonicalField(
+        name="zone",
+        label="Delivery zone",
+        kind=VALUE_TEXT,
+        aliases=(
+            "zone",
+            "zone code",
+            "shipping zone",
+            "ship zone",
+            "delivery zone",
+            "delivery region",
+        ),
+    ),
+    CanonicalField(
+        name="weight_grams",
+        label="Shipment weight (grams)",
+        kind=VALUE_AMOUNT,
+        aliases=(
+            "weight grams",
+            "weight in grams",
+            "weight g",
+            "charged weight",
+            "dead weight",
+            "weight",
+        ),
+    ),
+    CanonicalField(
+        name="tcs_amount",
+        label="TCS",
+        kind=VALUE_AMOUNT,
+        aliases=(
+            "tcs",
+            "tcs amount",
+            "gst tcs",
+            "tax collected at source",
+            "tcs deducted",
+        ),
+    ),
+    CanonicalField(
+        name="tds_amount",
+        label="TDS",
+        kind=VALUE_AMOUNT,
+        aliases=(
+            "tds",
+            "tds amount",
+            "gst tds",
+            "tax deducted at source",
+            "tds deducted",
+        ),
+    ),
 )
 
 FIELD_BY_NAME: Mapping[str, CanonicalField] = MappingProxyType(
@@ -300,6 +350,8 @@ OPTIONAL_FIELDS: Mapping[ImportSourceType, tuple[str, ...]] = MappingProxyType(
             "order_status",
             "shipping_charge",
             "courier_name",
+            "zone",
+            "weight_grams",
         ),
         ImportSourceType.SETTLEMENTS: (
             "external_order_id",
@@ -307,17 +359,25 @@ OPTIONAL_FIELDS: Mapping[ImportSourceType, tuple[str, ...]] = MappingProxyType(
             "order_status",
             "courier_name",
             "shipping_charge",
+            "tcs_amount",
+            "tds_amount",
         ),
         ImportSourceType.COD_REMITTANCES: (
             "external_order_id",
             "order_date",
             "courier_name",
             "shipping_charge",
+            "tcs_amount",
+            "tds_amount",
         ),
         ImportSourceType.FREIGHT_INVOICES: (
             "transaction_reference",
             "order_date",
             "external_order_id",
+            "zone",
+            "weight_grams",
+            "tcs_amount",
+            "tds_amount",
         ),
         ImportSourceType.RETURNS: (
             "order_date",

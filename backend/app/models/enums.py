@@ -60,11 +60,30 @@ class SettlementTransactionType(str, Enum):
 
 
 class ReconciliationStatus(str, Enum):
-    """Outcome of comparing an order against its settlement records."""
+    """Outcome of comparing an order against its settlement records.
 
-    MATCHED = "matched"
-    AMOUNT_MISMATCH = "amount_mismatch"
-    MISSING_IN_SETTLEMENT = "missing_in_settlement"
+    ``SETTLED``/``SHORT_PAID``/``UNPAID_PAST_DUE``/``PENDING`` describe the
+    order's payment state. ``MISSING_IN_ORDERS`` records a received settlement
+    line that could not be tied back to any order; those rows are never
+    discarded, they are reported so they can be investigated.
+    """
+
+    SETTLED = "settled"
+    SHORT_PAID = "short_paid"
+    UNPAID_PAST_DUE = "unpaid_past_due"
+    PENDING = "pending"
     MISSING_IN_ORDERS = "missing_in_orders"
-    PARTIAL = "partial"
-    UNMATCHED = "unmatched"
+
+
+class FreightServiceType(str, Enum):
+    """Direction of a shipment leg, used to look up a freight rate."""
+
+    FORWARD = "forward"
+    REVERSE = "reverse"
+
+
+class FreightPaymentType(str, Enum):
+    """How the shipment was paid for, used to look up a freight rate."""
+
+    PREPAID = "prepaid"
+    COD = "cod"
