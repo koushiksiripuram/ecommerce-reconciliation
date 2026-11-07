@@ -36,6 +36,7 @@ EXPECTED_TABLES = {
     "orders",
     "uploaded_files",
     "import_batches",
+    "import_column_mappings",
     "raw_imported_records",
     "settlement_records",
     "reconciliation_results",
@@ -122,6 +123,7 @@ def test_business_key_unique_constraints() -> None:
 
     assert ("external_order_id", "marketplace") in unique_column_sets("orders")
     assert ("external_reference", "marketplace") in unique_column_sets("settlement_records")
+    assert ("partner", "source_type") in unique_column_sets("import_column_mappings")
 
 
 def test_foreign_keys_target_the_right_tables_and_delete_rules() -> None:

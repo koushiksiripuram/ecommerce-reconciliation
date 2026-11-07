@@ -1,7 +1,8 @@
 """File upload, import batch and raw record models.
 
-These tables describe *what was ingested* and *how it went*. They hold no
-business logic — no parsing, validation or upload handling is implemented yet.
+These tables record *what was ingested* and *how it went*. The parsing,
+mapping and normalisation logic lives in :mod:`app.imports`; the models only
+describe the shape of the stored data.
 """
 
 from datetime import datetime
@@ -82,13 +83,19 @@ class ImportBatch(Base, TimestampMixin):
         portable_enum(ImportSourceType, "import_source_type"),
         nullable=False,
     )
+    #: The partner/marketplace the file came from. Also the scope key for the
+    #: saved column mappings in :class:`~app.models.mappings.ImportColumnMapping`.
     marketplace: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
     status: Mapped[ImportBatchStatus] = mapped_column(
         portable_enum(ImportBatchStatus, "import_batch_status"),
         nullable=False,
-        default=ImportBatchStatus.PENDING,
-        server_default=ImportBatchStatus.PENDING.value,
+        default=ImportBatchStatus.UPLOADED,
+        server_default=ImportBatchStatus.UPLOADED.value,
     )
+
+    #: Approved canonical-field -> source-header mapping for this batch. Kept on
+    #: the batch so a re-run is reproducible even if the saved mapping changes.
+    column_mapping: Mapped[dict[str, Any] | None] = mapped_column(JSON, nullable=True)
 
     total_rows: Mapped[int] = mapped_column(
         Integer, nullable=False, default=0, server_default=text("0")
@@ -131,6 +138,10 @@ class ImportBatch(Base, TimestampMixin):
 class RawImportedRecord(Base):
     """A single source row, preserved verbatim for traceability.
 
+    ``raw_data`` is the original row exactly as read from the file and is never
+    rewritten. ``normalized_data`` is the canonical-field projection produced
+    during processing, so the source of every stored value stays auditable.
+
     Only ``created_at`` is tracked: raw rows are immutable once written.
     """
 
@@ -146,10 +157,14 @@ class RawImportedRecord(Base):
 
     external_reference: Mapped[str | None] = mapped_column(String(128), nullable=True, index=True)
     raw_data: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    #: Canonical field -> normalized value, produced by the mapping/normalizer.
+    normalized_data: Mapped[dict[str, Any] | None] = mapped_column(JSON, nullable=True)
 
     is_valid: Mapped[bool] = mapped_column(
         Boolean, nullable=False, default=True, server_default=text("true")
     )
+    #: JSON-encoded list of ``{field, code, message}`` entries. Stored as text
+    #: because the column predates this feature; the API decodes it.
     validation_errors: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(

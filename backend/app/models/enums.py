@@ -20,18 +20,30 @@ class OrderStatus(str, Enum):
 
 
 class ImportSourceType(str, Enum):
-    """Kind of source data contained in an import batch."""
+    """Kind of source data contained in an import batch.
+
+    ``CLAIMS`` is declared in the schema for forward compatibility but is not
+    accepted by the import API yet.
+    """
 
     ORDERS = "orders"
     SETTLEMENTS = "settlements"
+    COD_REMITTANCES = "cod_remittances"
+    FREIGHT_INVOICES = "freight_invoices"
     RETURNS = "returns"
     CLAIMS = "claims"
 
 
 class ImportBatchStatus(str, Enum):
-    """Processing state of an import batch."""
+    """Processing state of an import batch.
 
-    PENDING = "pending"
+    ``UPLOADED`` means the file is parsed and a complete mapping is in place, so
+    it is ready to process. ``MAPPING_REQUIRED`` means at least one required
+    canonical field is still unmapped and a human must intervene.
+    """
+
+    UPLOADED = "uploaded"
+    MAPPING_REQUIRED = "mapping_required"
     PROCESSING = "processing"
     COMPLETED = "completed"
     FAILED = "failed"

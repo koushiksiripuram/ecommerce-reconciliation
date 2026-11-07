@@ -1,6 +1,7 @@
 """Application configuration loaded from environment variables."""
 
 from functools import lru_cache
+from pathlib import Path
 
 from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -62,6 +63,17 @@ class Settings(BaseSettings):
     auth_cookie_secure: bool = False
     auth_cookie_samesite: str = "lax"
 
+    # File imports
+    #
+    # Uploaded source files are written here verbatim so raw values can be
+    # re-read for previews and re-processing. The directory is git-ignored.
+    upload_storage_dir: str = "storage/uploads"
+    max_upload_size_bytes: int = 10 * 1024 * 1024
+    #: Rows returned by the preview endpoint.
+    import_preview_rows: int = 20
+    #: Rows written per database round trip while processing an import.
+    import_batch_size: int = 500
+
     @model_validator(mode="after")
     def _check_secret(self) -> "Settings":
         """Refuse to start outside development with the placeholder secret."""
@@ -84,6 +96,11 @@ class Settings(BaseSettings):
             f"postgresql+psycopg2://{self.postgres_user}:{self.postgres_password}"
             f"@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
         )
+
+    @property
+    def upload_storage_path(self) -> Path:
+        """Directory where uploaded files are stored, resolved against the cwd."""
+        return Path(self.upload_storage_dir).expanduser()
 
 
 @lru_cache

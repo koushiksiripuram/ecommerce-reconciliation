@@ -20,6 +20,12 @@ dist-ssr/
 # Logs
 *.log
 
+# Uploaded import files (kept on disk, never committed)
+storage/
+
+# Claude Code local settings (may contain API keys - never commit)
+.claude/
+
 # Editors / OS
 .vscode/
 .idea/
