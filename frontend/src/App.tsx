@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { AuthProvider, useAuth } from './auth/AuthContext'
 import { Layout } from './components/Layout'
 import { NAV_ITEMS } from './config/navigation'
+import { Imports } from './pages/Imports'
 import { Login } from './pages/Login'
 import { Overview } from './pages/Overview'
 import { PlaceholderPage } from './pages/Placeholder'
@@ -14,6 +15,17 @@ function SessionLoading() {
       </p>
     </div>
   )
+}
+
+function renderScreen(activeId: string, title: string) {
+  switch (activeId) {
+    case 'overview':
+      return <Overview />
+    case 'imports':
+      return <Imports />
+    default:
+      return <PlaceholderPage title={title} />
+  }
 }
 
 function AppContent() {
@@ -39,7 +51,7 @@ function AppContent() {
       user={user}
       onSignOut={signOut}
     >
-      {activeId === 'overview' ? <Overview /> : <PlaceholderPage title={activeItem.label} />}
+      {renderScreen(activeId, activeItem.label)}
     </Layout>
   )
 }

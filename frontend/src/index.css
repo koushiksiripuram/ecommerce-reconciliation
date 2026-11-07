@@ -7,6 +7,14 @@
   --color-sidebar-bg: #131a24;
   --color-sidebar-text: #aeb8c6;
   --color-accent: #2f6fed;
+  --color-success: #1a7f45;
+  --color-success-bg: #e4f6ea;
+  --color-warning: #8a5a00;
+  --color-warning-bg: #fff4d6;
+  --color-danger: #b3261e;
+  --color-danger-bg: #fdeaea;
+  --color-info: #2f6fed;
+  --color-info-bg: #e8f0fe;
 
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   line-height: 1.5;
@@ -360,3 +368,463 @@ body {
 .placeholder-list__dash {
   color: var(--color-border);
 }
+
+/* Buttons (secondary) ---------------------------------------------------- */
+
+.button--ghost {
+  background-color: #fff;
+  border-color: var(--color-border);
+  color: var(--color-text);
+}
+
+.button--ghost:hover:not(:disabled) {
+  background-color: #f2f4f7;
+}
+
+.link-button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-accent);
+  font-size: 13px;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.link-button:hover {
+  text-decoration: underline;
+}
+
+/* Layout helpers --------------------------------------------------------- */
+
+.page--wide {
+  max-width: 1100px;
+}
+
+.muted {
+  color: var(--color-text-muted);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.empty-state {
+  margin: 8px 0 0;
+  padding: 18px;
+  border: 1px dashed var(--color-border);
+  border-radius: 8px;
+  color: var(--color-text-muted);
+  font-size: 14px;
+  text-align: center;
+}
+
+/* Alerts ----------------------------------------------------------------- */
+
+.alert {
+  margin: 0;
+  padding: 9px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.alert--danger {
+  background-color: var(--color-danger-bg);
+  color: var(--color-danger);
+}
+
+.alert--success {
+  background-color: var(--color-success-bg);
+  color: var(--color-success);
+}
+
+.alert--warning {
+  background-color: var(--color-warning-bg);
+  color: var(--color-warning);
+}
+
+/* Import upload form ----------------------------------------------------- */
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.field--wide {
+  grid-column: 1 / -1;
+}
+
+.card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.progress {
+  position: relative;
+  margin-top: 14px;
+  height: 22px;
+  border-radius: 999px;
+  background-color: #eef0f3;
+  overflow: hidden;
+}
+
+.progress__bar {
+  height: 100%;
+  background-color: var(--color-accent);
+  transition: width 0.15s ease;
+}
+
+.progress__label {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+/* Toolbar & filters ------------------------------------------------------ */
+
+.toolbar {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  margin: 12px 0 4px;
+}
+
+.toolbar--wrap {
+  flex-wrap: wrap;
+}
+
+.toolbar__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 160px;
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--color-text);
+}
+
+/* Tables ----------------------------------------------------------------- */
+
+.table-scroll {
+  overflow-x: auto;
+  margin-top: 14px;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.data-table th,
+.data-table td {
+  padding: 9px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: top;
+  white-space: nowrap;
+}
+
+.data-table th {
+  color: var(--color-text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.data-table tbody tr:hover {
+  background-color: #fafbfc;
+}
+
+.data-table__strong {
+  font-weight: 600;
+}
+
+.data-table__num,
+.data-table__index {
+  text-align: right;
+  color: var(--color-text-muted);
+}
+
+.data-table__details td {
+  background-color: #fafbfc;
+  white-space: normal;
+}
+
+/* Tags / pills ----------------------------------------------------------- */
+
+.tag {
+  display: inline-block;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.tag--neutral {
+  background-color: #eef0f3;
+  color: var(--color-text-muted);
+}
+
+.tag--info {
+  background-color: var(--color-info-bg);
+  color: var(--color-info);
+}
+
+.tag--success,
+.tag--valid {
+  background-color: var(--color-success-bg);
+  color: var(--color-success);
+}
+
+.tag--warning {
+  background-color: var(--color-warning-bg);
+  color: var(--color-warning);
+}
+
+.tag--danger,
+.tag--invalid {
+  background-color: var(--color-danger-bg);
+  color: var(--color-danger);
+}
+
+/* Mapping confidence tags */
+.tag--saved,
+.tag--exact,
+.tag--alias,
+.tag--contains,
+.tag--manual {
+  background-color: #eef0f3;
+  color: var(--color-text-muted);
+}
+
+/* Mapping editor --------------------------------------------------------- */
+
+.mapping-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 14px;
+}
+
+.mapping-row {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(220px, 1fr);
+  gap: 16px;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.mapping-row__field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.mapping-row__label {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.mapping-row__meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-text-muted);
+  font-size: 12px;
+}
+
+.mapping-row__meta code {
+  font-size: 12px;
+}
+
+.mapping-row__suggested {
+  color: var(--color-text-muted);
+  font-size: 12px;
+}
+
+.required-dot {
+  color: var(--color-danger);
+  font-weight: 700;
+}
+
+.mapping-note {
+  margin: 12px 0 0;
+  color: var(--color-text-muted);
+  font-size: 12px;
+}
+
+/* Row error list --------------------------------------------------------- */
+
+.error-list {
+  margin: 0;
+  padding-left: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  white-space: normal;
+  font-size: 12px;
+  color: var(--color-danger);
+}
+
+/* Record details --------------------------------------------------------- */
+
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.details-grid__title {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--color-text-muted);
+}
+
+.kv {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.kv__row {
+  display: grid;
+  grid-template-columns: minmax(120px, 40%) 1fr;
+  gap: 10px;
+  font-size: 13px;
+}
+
+.kv__row dt {
+  color: var(--color-text-muted);
+}
+
+.kv__row dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Pagination ------------------------------------------------------------- */
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.pagination__label {
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+/* Detail header & summary ------------------------------------------------ */
+
+.detail-header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.detail-header__title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.summary-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+}
+
+.summary-tile__label {
+  color: var(--color-text-muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.summary-tile__value {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.summary-tile__value--small {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Responsive ------------------------------------------------------------- */
+
+@media (max-width: 760px) {
+  .app-shell {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    flex: 0 0 auto;
+    padding: 14px 12px;
+  }
+
+  .sidebar__nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .sidebar__footer {
+    margin-top: 12px;
+  }
+
+  .app-main {
+    padding: 20px 16px;
+  }
+
+  .form-grid,
+  .mapping-row,
+  .details-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+

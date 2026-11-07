@@ -303,8 +303,19 @@ def read_table(batch: ImportBatch) -> parser.ParsedTable:
     return parser.parse_bytes(stored.original_filename, path.read_bytes())
 
 
-def build_preview(batch: ImportBatch, *, limit: int) -> dict[str, Any]:
-    """Describe the uploaded columns, sample rows and current mapping."""
+def build_preview(
+    batch: ImportBatch,
+    *,
+    limit: int,
+    saved: Mapping[str, str] | None = None,
+) -> dict[str, Any]:
+    """Describe the uploaded columns, sample rows and current mapping.
+
+    ``saved`` is the approved mapping for this batch's source and partner, when
+    one exists. Passing it lets a column that was auto-mapped from a previously
+    approved mapping be reported with the ``saved`` confidence rather than
+    looking like a manual edit.
+    """
     table = read_table(batch)
     current = {
         name: header
@@ -315,7 +326,7 @@ def build_preview(batch: ImportBatch, *, limit: int) -> dict[str, Any]:
 
     # Recomputing the suggestion tells the UI how each auto-mapped column was
     # recognised; anything the operator changed by hand is reported as manual.
-    suggestion = mapping_layer.suggest_mapping(batch.source_type, table.headers, saved=None)
+    suggestion = mapping_layer.suggest_mapping(batch.source_type, table.headers, saved=saved)
 
     fields = []
     for field in fields_for_source(batch.source_type):

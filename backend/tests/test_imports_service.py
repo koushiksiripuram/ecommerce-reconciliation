@@ -445,6 +445,28 @@ def test_build_preview_lists_missing_required_fields(
     }
 
 
+def test_build_preview_reports_reused_mapping_as_saved(
+    db_session: Session, upload_dir: Path
+) -> None:
+    """A mapping reused from the partner's approved one must not read as manual."""
+    saved = {
+        "external_order_id": "Ref No",
+        "order_date": "Date",
+        "order_amount": "Value",
+    }
+    batch = _upload(db_session, content=b"Ref No,Date,Value\nRF-1,2026-02-01,2500\n", partner="acme")
+    service.update_mapping(
+        db_session, batch, mapping=saved, save_for_partner=True, user_id=None
+    )
+
+    stored = service.load_saved_mapping(db_session, ORDERS, "acme")
+    preview = service.build_preview(batch, limit=5, saved=stored)
+
+    confidence = {field["name"]: field["confidence"] for field in preview["fields"]}
+    assert confidence["external_order_id"] == "saved"
+    assert confidence["order_amount"] == "saved"
+
+
 def test_list_batches_filters_by_partner(db_session: Session, upload_dir: Path) -> None:
     _upload(db_session, partner="amazon")
     _upload(db_session, partner="flipkart")

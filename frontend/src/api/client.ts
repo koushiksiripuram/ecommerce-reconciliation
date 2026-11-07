@@ -1,5 +1,5 @@
 /** Base URL for backend API calls. Falls back to the Vite dev proxy path. */
-const API_BASE_URL: string = import.meta.env.VITE_API_BASE_URL ?? '/api'
+export const API_BASE_URL: string = import.meta.env.VITE_API_BASE_URL ?? '/api'
 
 /** Error carrying the HTTP status so callers can branch on 401/403. */
 export class ApiError extends Error {
@@ -30,17 +30,41 @@ export interface CurrentUser {
   role: Role
 }
 
+/**
+ * Turn a backend `detail` value into a human-readable message.
+ *
+ * FastAPI returns a plain string for most failures, a `{message, ...}` object
+ * for structured errors (e.g. duplicate imports) and a list of items for
+ * request-validation errors.
+ */
+export function apiErrorMessage(detail: unknown, status: number): string {
+  if (typeof detail === 'string' && detail.length > 0) {
+    return detail
+  }
+  if (detail !== null && typeof detail === 'object' && !Array.isArray(detail)) {
+    const message = (detail as { message?: unknown }).message
+    if (typeof message === 'string' && message.length > 0) {
+      return message
+    }
+  }
+  if (Array.isArray(detail) && detail.length > 0) {
+    const first = detail[0] as { msg?: unknown }
+    if (first !== null && typeof first === 'object' && typeof first.msg === 'string') {
+      return first.msg
+    }
+  }
+  return `Request failed with status ${status}`
+}
+
 /** Extract the backend `detail` field when present, else fall back to the status. */
 async function readErrorMessage(response: Response): Promise<string> {
   try {
     const body = (await response.json()) as { detail?: unknown }
-    if (typeof body.detail === 'string') {
-      return body.detail
-    }
+    return apiErrorMessage(body.detail, response.status)
   } catch {
     // Non-JSON error body; fall through to the generic message.
+    return `Request failed with status ${response.status}`
   }
-  return `Request failed with status ${response.status}`
 }
 
 /**
@@ -66,6 +90,8 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
 
   return (await response.json()) as T
 }
+
+export { request }
 
 /** Call the backend health endpoint. */
 export function fetchHealth(): Promise<HealthResponse> {

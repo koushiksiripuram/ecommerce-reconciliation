@@ -114,7 +114,10 @@ def get_import(batch_id: int, user: CurrentUser, db: DbSession) -> ImportBatchRe
 def preview_import(batch_id: int, user: CurrentUser, db: DbSession) -> ImportPreviewRead:
     """Return the uploaded columns, sample rows and the mapping under review."""
     batch = service.get_batch(db, batch_id)
-    preview = service.build_preview(batch, limit=get_settings().import_preview_rows)
+    saved = service.load_saved_mapping(db, batch.source_type, batch.marketplace or "")
+    preview = service.build_preview(
+        batch, limit=get_settings().import_preview_rows, saved=saved
+    )
     return ImportPreviewRead(batch=ImportBatchRead.from_model(batch), **preview)
 
 
