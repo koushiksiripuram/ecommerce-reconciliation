@@ -16,6 +16,8 @@ const STATUS_OPTIONS: Array<{ value: ReconciliationStatus | ''; label: string }>
 export interface ReconciliationFilters {
   status: ReconciliationStatus | ''
   marketplace: string
+  /** When true, ask the API for lines that have at least one detected issue. */
+  onlyIssues: boolean
 }
 
 interface ResultsTableProps {
@@ -113,6 +115,17 @@ export function ReconciliationResultsTable({
               </option>
             ))}
           </select>
+        </label>
+
+        <label className="checkbox">
+          <input
+            type="checkbox"
+            checked={filters.onlyIssues}
+            onChange={(event) =>
+              onFiltersChange({ ...filters, onlyIssues: event.target.checked })
+            }
+          />
+          <span>Only lines with issues</span>
         </label>
       </div>
 

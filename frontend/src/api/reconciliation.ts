@@ -154,11 +154,16 @@ export interface RunListParams {
   offset?: number
 }
 
-/** Drop empty filter values and serialise the rest as a query string. */
+/**
+ * Drop unset filter values and serialise the rest as a query string.
+ *
+ * `false` is a real filter value (e.g. `has_issues=false`), so only `undefined`
+ * and the empty string are treated as "no filter".
+ */
 function toQuery(params: Record<string, string | number | boolean | undefined>): string {
   const search = new URLSearchParams()
   for (const [key, value] of Object.entries(params)) {
-    if (value === undefined || value === '' || value === false) continue
+    if (value === undefined || value === '') continue
     search.set(key, String(value))
   }
   const query = search.toString()

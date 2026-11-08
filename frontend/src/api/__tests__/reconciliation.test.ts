@@ -36,7 +36,7 @@ function stubFetch(body: unknown = {}, status = 200) {
 
 /** The URL passed to the most recent fetch call. */
 function lastUrl(fetchMock: ReturnType<typeof vi.fn>): string {
-  const [url] = fetchMock.mock.calls.at(-1) as [string]
+  const [url] = fetchMock.mock.calls.at(-1) as unknown as [string]
   return url
 }
 
@@ -62,12 +62,20 @@ describe('reconciliation API client', () => {
     )
   })
 
-  it('drops empty filters and falsey flags instead of sending blanks', async () => {
+  it('drops empty strings and unset filters instead of sending blanks', async () => {
     const fetchMock = stubFetch({ rows: [], total: 0 })
 
-    await listResults({ status: '', marketplace: '', hasIssues: false, runId: undefined })
+    await listResults({ status: '', marketplace: '', runId: undefined })
 
     expect(lastUrl(fetchMock)).toBe(`${API_BASE_URL}/reconciliation`)
+  })
+
+  it('forwards an explicit false flag, since has_issues=false is a real filter', async () => {
+    const fetchMock = stubFetch({ rows: [], total: 0 })
+
+    await listResults({ hasIssues: false })
+
+    expect(lastUrl(fetchMock)).toBe(`${API_BASE_URL}/reconciliation?has_issues=false`)
   })
 
   it('reads the latest run when no run_id is given', async () => {
@@ -110,7 +118,7 @@ describe('reconciliation API client', () => {
 
     await runReconciliation()
 
-    const [url, init] = fetchMock.mock.calls.at(-1) as [string, RequestInit]
+    const [url, init] = fetchMock.mock.calls.at(-1) as unknown as [string, RequestInit]
     expect(url).toBe(`${API_BASE_URL}/reconciliation/run`)
     expect(init.method).toBe('POST')
   })

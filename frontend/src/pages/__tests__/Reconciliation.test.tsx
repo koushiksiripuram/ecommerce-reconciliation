@@ -73,6 +73,7 @@ describe('Reconciliation page', () => {
     await waitFor(() => expect(listResults).toHaveBeenCalledWith({
       status: '',
       marketplace: '',
+      hasIssues: undefined,
       runId: 2,
       limit: 20,
       offset: 0,

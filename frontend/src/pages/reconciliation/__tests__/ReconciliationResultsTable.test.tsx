@@ -33,7 +33,7 @@ function setup(overrides: SetupOverrides = {}) {
       total={overrides.total ?? 1}
       isLoading={overrides.isLoading ?? false}
       error={overrides.error ?? null}
-      filters={overrides.filters ?? { status: '', marketplace: '' }}
+      filters={overrides.filters ?? { status: '', marketplace: '', onlyIssues: false }}
       marketplaces={overrides.marketplaces ?? ['amazon']}
       page={overrides.page ?? 0}
       pageSize={overrides.pageSize ?? 20}
@@ -54,7 +54,11 @@ function FilterHarness({
 }: {
   onFiltersChange: (filters: ReconciliationFilters) => void
 }) {
-  const [filters, setFilters] = useState<ReconciliationFilters>({ status: '', marketplace: '' })
+  const [filters, setFilters] = useState<ReconciliationFilters>({
+    status: '',
+    marketplace: '',
+    onlyIssues: false,
+  })
 
   return (
     <ReconciliationResultsTable
@@ -155,10 +159,31 @@ describe('ReconciliationResultsTable', () => {
     render(<FilterHarness onFiltersChange={onFiltersChange} />)
 
     await user.selectOptions(screen.getByLabelText('Status'), 'short_paid')
-    expect(onFiltersChange).toHaveBeenLastCalledWith({ status: 'short_paid', marketplace: '' })
+    expect(onFiltersChange).toHaveBeenLastCalledWith({
+      status: 'short_paid',
+      marketplace: '',
+      onlyIssues: false,
+    })
 
     await user.selectOptions(screen.getByLabelText('Marketplace'), 'flipkart')
-    expect(onFiltersChange).toHaveBeenLastCalledWith({ status: 'short_paid', marketplace: 'flipkart' })
+    expect(onFiltersChange).toHaveBeenLastCalledWith({
+      status: 'short_paid',
+      marketplace: 'flipkart',
+      onlyIssues: false,
+    })
+  })
+
+  it('toggles the "only lines with issues" filter', async () => {
+    const user = userEvent.setup()
+    const onFiltersChange = vi.fn()
+    render(<FilterHarness onFiltersChange={onFiltersChange} />)
+
+    await user.click(screen.getByRole('checkbox', { name: /only lines with issues/i }))
+    expect(onFiltersChange).toHaveBeenLastCalledWith({
+      status: '',
+      marketplace: '',
+      onlyIssues: true,
+    })
   })
 
   it('shows an empty state when there are no results', () => {

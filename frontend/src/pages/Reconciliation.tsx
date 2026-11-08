@@ -18,7 +18,7 @@ import { formatDateTime } from './reconciliation/format'
 const PAGE_SIZE = 20
 const RUN_PAGE_SIZE = 10
 
-const EMPTY_FILTERS: ReconciliationFilters = { status: '', marketplace: '' }
+const EMPTY_FILTERS: ReconciliationFilters = { status: '', marketplace: '', onlyIssues: false }
 
 function listErrorMessage(error: unknown): string {
   if (error instanceof ApiError && error.status === 401) {
@@ -135,6 +135,7 @@ export function Reconciliation() {
     listResults({
       status: filters.status,
       marketplace: marketplaceFilter,
+      hasIssues: filters.onlyIssues ? true : undefined,
       runId: activeRunId,
       limit: PAGE_SIZE,
       offset: page * PAGE_SIZE,
