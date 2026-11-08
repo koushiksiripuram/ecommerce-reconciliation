@@ -101,7 +101,11 @@ class Settings(BaseSettings):
 
     @property
     def database_url(self) -> str:
-        """Return the SQLAlchemy connection URL for PostgreSQL."""
+        """Return the SQLAlchemy connection URL for PostgreSQL.
+
+        ``DATABASE_URL`` wins when set; otherwise the URL is assembled from the
+        discrete ``POSTGRES_*`` variables.
+        """
         if self.database_url_override:
             return self.database_url_override
         return (

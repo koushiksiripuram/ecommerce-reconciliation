@@ -1,7 +1,7 @@
-# Environment files (never commit real secrets)
-.env
-.env.*
-!.env.example
+# # Environment files (never commit real secrets)
+# .env
+# .env.*
+# !.env.example
 
 # Python
 __pycache__/
@@ -17,17 +17,17 @@ node_modules/
 dist/
 dist-ssr/
 
-# Logs
-*.log
+# # Logs
+# *.log
 
-# Uploaded import files (kept on disk, never committed)
-storage/
+# # Uploaded import files (kept on disk, never committed)
+# storage/
 
-# Claude Code local settings (may contain API keys - never commit)
-.claude/
+# # Claude Code local settings (may contain API keys - never commit)
+# .claude/
 
-# Editors / OS
-.vscode/
-.idea/
-.DS_Store
-Thumbs.db
+# # Editors / OS
+# .vscode/
+# .idea/
+# .DS_Store
+# Thumbs.db

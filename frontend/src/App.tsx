@@ -5,7 +5,6 @@ import { NAV_ITEMS } from './config/navigation'
 import { Imports } from './pages/Imports'
 import { Login } from './pages/Login'
 import { Overview } from './pages/Overview'
-import { PlaceholderPage } from './pages/Placeholder'
 import { Reconciliation } from './pages/Reconciliation'
 
 function SessionLoading() {
@@ -18,16 +17,15 @@ function SessionLoading() {
   )
 }
 
-function renderScreen(activeId: string, title: string) {
+function renderScreen(activeId: string) {
   switch (activeId) {
-    case 'overview':
-      return <Overview />
     case 'imports':
       return <Imports />
     case 'reconciliation':
       return <Reconciliation />
+    case 'overview':
     default:
-      return <PlaceholderPage title={title} />
+      return <Overview />
   }
 }
 
@@ -44,8 +42,6 @@ function AppContent() {
     return <Login />
   }
 
-  const activeItem = NAV_ITEMS.find((item) => item.id === activeId) ?? NAV_ITEMS[0]
-
   return (
     <Layout
       items={NAV_ITEMS}
@@ -54,7 +50,7 @@ function AppContent() {
       user={user}
       onSignOut={signOut}
     >
-      {renderScreen(activeId, activeItem.label)}
+      {renderScreen(activeId)}
     </Layout>
   )
 }

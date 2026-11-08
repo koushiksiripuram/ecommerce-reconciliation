@@ -1,0 +1,3 @@
+Order ID,Order Date,Order Amount,Order Status,Payment Mode,Courier,Zone,Weight
+A-1,2020-01-05,100.00,Delivered,Prepaid,Delhivery,A,1000
+A-2,2020-01-06,200.00,Delivered,Prepaid,Delhivery,A,1500

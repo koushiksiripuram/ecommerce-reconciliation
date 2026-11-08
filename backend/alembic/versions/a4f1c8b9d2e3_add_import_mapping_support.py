@@ -27,24 +27,19 @@ branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
 
-# Enum value sets before and after this migration. Kept self-contained so the
-# migration does not drift if the application enums change later.
-_OLD_SOURCE_TYPE = sa.Enum(
-    'orders', 'settlements', 'returns', 'claims',
-    name='import_source_type', native_enum=False, create_constraint=True,
-)
-_NEW_SOURCE_TYPE = sa.Enum(
-    'orders', 'settlements', 'cod_remittances', 'freight_invoices', 'returns', 'claims',
-    name='import_source_type', native_enum=False, create_constraint=True,
-)
-_OLD_BATCH_STATUS = sa.Enum(
-    'pending', 'processing', 'completed', 'failed',
-    name='import_batch_status', native_enum=False, create_constraint=True,
-)
-_NEW_BATCH_STATUS = sa.Enum(
-    'uploaded', 'mapping_required', 'processing', 'completed', 'failed',
-    name='import_batch_status', native_enum=False, create_constraint=True,
-)
+# These columns are stored as VARCHAR + CHECK constraint on every engine (the
+# application uses ``portable_enum``, which sets ``native_enum=False``). The
+# migration only widens the VARCHAR length and swaps the CHECK constraint by
+# hand below, so the column type is declared as a plain ``String``.
+#
+# Do NOT pass an ``Enum(..., create_constraint=True)`` to ``alter_column`` here:
+# Alembic would additionally emit the type's own DROP/ADD CONSTRAINT around the
+# ALTER, duplicating the explicit statements below and failing on PostgreSQL
+# with "constraint ... does not exist".
+_OLD_SOURCE_TYPE = sa.String(length=11)   # longest old value: 'settlements'
+_NEW_SOURCE_TYPE = sa.String(length=16)   # longest new value: 'freight_invoices'
+_OLD_BATCH_STATUS = sa.String(length=10)  # longest old value: 'processing'
+_NEW_BATCH_STATUS = sa.String(length=16)  # longest new value: 'mapping_required'
 
 _SOURCE_TYPE_CHECK = (
     "source_type IN ('orders', 'settlements', 'cod_remittances', "

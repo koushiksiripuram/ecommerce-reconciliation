@@ -128,7 +128,6 @@ ecommerce-reconciliation/
         └── pages/
             ├── Login.tsx       # Login screen
             ├── Overview.tsx    # Overview page
-            ├── Placeholder.tsx # Placeholder for not-yet-built sections
             ├── Imports.tsx     # Imports workflow (upload → map → process → history)
             ├── imports/        # UploadForm, MappingEditor, PreviewTable, History, Detail
             └── reconciliation/ # Summary, ResultsTable, Runs, Detail + formatters
@@ -138,9 +137,10 @@ ecommerce-reconciliation/
 
 - Python 3.11+
 - Node.js 20+
-- A PostgreSQL 14+ database. A **hosted** instance is expected — no local
-  installation is needed for development, and the API starts without one.
-  Only `alembic upgrade` and any runtime query actually connect.
+- A database. **PostgreSQL 14+** is the only supported engine. A local instance
+  can be started with `docker compose up -d postgres`. The API starts even while
+  the database is unreachable, so no connection is opened until the first query
+  or migration runs.
 
 ## Backend setup
 
@@ -191,20 +191,22 @@ The API is then available at `http://localhost:8000`, with interactive docs at
 
 > `CORS_ORIGINS` must be valid JSON, e.g. `["http://localhost:5173","https://app.example.com"]`.
 
-The database connection has two mutually exclusive options:
+The database connection has a single precedence rule — `DATABASE_URL` wins
+whenever it is set — with two ways to supply a PostgreSQL connection:
 
-- **Option A — `DATABASE_URL` (recommended for hosted PostgreSQL).** Set a single
-  full connection string, which is exactly what most managed providers hand you:
+- **Option A — `DATABASE_URL` (recommended for hosted setups).** Set a single
+  full connection string, which is exactly what most managed providers hand
+  you:
 
   ```
   DATABASE_URL=postgresql+psycopg2://USER:PASSWORD@HOST:5432/DBNAME?sslmode=require
   ```
 
-- **Option B — discrete `POSTGRES_*` variables.** The URL is assembled from the
-  individual parts. Useful for local or containerised development.
+- **Option B — discrete `POSTGRES_*` variables.** The PostgreSQL URL is
+  assembled from the individual parts. Used only when `DATABASE_URL` is unset.
 
-`DATABASE_URL` wins whenever it is present. No credentials are committed to the
-repository — `.env` is git-ignored and only `.env.example` is tracked.
+No credentials are committed to the repository — `.env` is git-ignored and only
+`.env.example` is tracked.
 
 ### Database schema
 
@@ -263,8 +265,8 @@ To add a future migration:
 alembic revision --autogenerate -m "describe the change"
 ```
 
-> A hosted PostgreSQL database is not required to run the tests or start the
-> API. Only `alembic upgrade` and runtime queries actually connect.
+> The API starts even when PostgreSQL is not reachable: only `alembic upgrade`
+> and runtime queries actually open a connection.
 
 ## Import pipeline
 
@@ -389,16 +391,25 @@ token is missing, malformed, expired or belongs to a non-existent user, and
 
 There is **no public registration and no default credentials**. The only way to
 create a user is the CLI command, which hashes the password with Argon2id before
-inserting:
+inserting it into the configured PostgreSQL database:
 
 ```bash
 # From the backend/ directory, with the virtualenv active and .env populated.
-# Prompts for the password (with confirmation) when --password is omitted.
+# Interactive: prompts for the email, a hidden password (entered twice) and the
+# role, so it runs with no arguments at all.
+python -m app.cli create-user
+
+# Non-interactive (CI / provisioning): supply every value as a flag.
 python -m app.cli create-user \
   --email finance@example.com \
   --full-name "Finance Executive" \
-  --role finance_executive
+  --role finance_executive \
+  --password "..."
 ```
+
+> Inside the Docker stack the database lives in the `postgres` container, so run
+> the CLI in the backend container so it targets that database:
+> `docker compose exec backend python -m app.cli create-user`.
 
 Passwords are never returned by any endpoint: the API response schema
 (`UserRead`) exposes only `id`, `email`, `full_name`, `is_active` and `role`.
@@ -426,7 +437,7 @@ Passwords are never returned by any endpoint: the API response schema
 ### Backend
 
 Tests run against in-memory SQLite, so no PostgreSQL instance is needed. The
-suite has **259 tests**.
+suite has **275 tests**.
 
 ```bash
 # From the backend/ directory, with the virtualenv active:
@@ -444,12 +455,14 @@ cascades), the Alembic migration chain (schema matches the models, roles are
 seeded, constraints enforced), CSV/XLSX parsing, mapping suggestion and reuse,
 value normalisation, the end-to-end import pipeline, and the reconciliation
 engine (partial and multiple settlements, TCS/TDS separation, duplicate
-settlements, freight overcharges, run supersession and historical filtering).
+settlements, freight overcharges, run supersession and historical filtering),
+and user creation through the CLI (interactive prompts, validation, duplicate
+rejection and Argon2id storage).
 
 ### Frontend
 
 The React app is tested with **Vitest** + Testing Library in a jsdom
-environment. The suite has **75 tests**.
+environment. The suite has **77 tests**.
 
 ```bash
 # From the frontend/ directory:
@@ -517,10 +530,10 @@ npm run dev
 
 Then open `http://localhost:5173`. You will be shown the login screen; sign in
 with a user created via the CLI (see [Creating users](#creating-users)). After
-signing in, the sidebar provides navigation for **Overview**, **Imports**,
-**Reconciliation**, **Rate Cards**, **Returns** and **Claims**; **Imports** and
-**Reconciliation** are fully implemented, the rest are placeholders for
-not-yet-built sections.
+signing in, the sidebar provides navigation for **Overview**, **Imports** and
+**Reconciliation** — every section shown is fully implemented and backed by the
+API. Sections that are out of scope for this build (Rate Cards, Returns, Claims)
+are intentionally not listed.
 
 ### Verifying the setup
 
@@ -565,11 +578,14 @@ Implemented:
 - The **React UI** for the import workflow and for reconciliation (summary,
   filterable results, order + settlement evidence, run history).
 
-Not yet implemented, by design:
+Not implemented, by design (and deliberately not shown in the UI, so nothing
+appears to work that does not):
 
-- A CRUD API/UI for freight rate cards (the table and lookup exist; the data is
-  populated out of band).
+- A CRUD API/UI for freight rate cards. The `freight_rate_cards` table and the
+  lookup used for overcharge detection exist, but the data is populated out of
+  band; there is no Rate Cards screen.
 - Returns reconciliation and refund classification beyond storing and
-  normalising return rows.
-- The `Rate Cards`, `Returns` and `Claims` sidebar sections.
+  normalising return rows (the `returns` source type is importable, but returns
+  are not reconciled).
+- Claims: not modelled or imported at all.
 - AI features (e.g. anomaly detection, forecasting).

@@ -27,17 +27,16 @@ branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
 
-# Enum value sets before and after this migration. Kept self-contained so the
-# migration does not drift if the application enums change later.
-_OLD_STATUS = sa.Enum(
-    'matched', 'amount_mismatch', 'missing_in_settlement', 'missing_in_orders',
-    'partial', 'unmatched',
-    name='reconciliation_status', native_enum=False, create_constraint=True,
-)
-_NEW_STATUS = sa.Enum(
-    'settled', 'short_paid', 'unpaid_past_due', 'pending', 'missing_in_orders',
-    name='reconciliation_status', native_enum=False, create_constraint=True,
-)
+# ``reconciliation_results.status`` is a VARCHAR + CHECK constraint. The
+# migration widens the VARCHAR length and swaps the CHECK constraint by hand, so
+# the column type is declared as a plain ``String``.
+#
+# Do NOT pass an ``Enum(..., create_constraint=True)`` to ``alter_column`` here:
+# Alembic would additionally emit the type's own DROP/ADD CONSTRAINT around the
+# ALTER, duplicating the explicit statements below and failing on PostgreSQL
+# with "constraint ... does not exist".
+_OLD_STATUS = sa.String(length=21)  # longest old value: 'missing_in_settlement'
+_NEW_STATUS = sa.String(length=17)  # longest new value: 'missing_in_orders'
 
 _OLD_STATUS_CHECK = (
     "status IN ('matched', 'amount_mismatch', 'missing_in_settlement', "
