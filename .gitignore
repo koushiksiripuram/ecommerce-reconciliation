@@ -1,7 +1,5 @@
 # # Environment files (never commit real secrets)
-# .env
-# .env.*
-# !.env.example
+ 
 
 # Python
 __pycache__/
@@ -17,6 +15,7 @@ node_modules/
 dist/
 dist-ssr/
 
+frontend/cookies.txt
 # # Logs
 # *.log
 
