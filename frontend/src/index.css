@@ -611,6 +611,13 @@ body {
   color: var(--color-danger);
 }
 
+/* A row of issue pills in a table cell. */
+.issue-tags {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
 /* Mapping confidence tags */
 .tag--saved,
 .tag--exact,

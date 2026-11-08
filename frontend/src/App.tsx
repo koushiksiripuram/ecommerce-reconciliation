@@ -6,6 +6,7 @@ import { Imports } from './pages/Imports'
 import { Login } from './pages/Login'
 import { Overview } from './pages/Overview'
 import { PlaceholderPage } from './pages/Placeholder'
+import { Reconciliation } from './pages/Reconciliation'
 
 function SessionLoading() {
   return (
@@ -23,6 +24,8 @@ function renderScreen(activeId: string, title: string) {
       return <Overview />
     case 'imports':
       return <Imports />
+    case 'reconciliation':
+      return <Reconciliation />
     default:
       return <PlaceholderPage title={title} />
   }

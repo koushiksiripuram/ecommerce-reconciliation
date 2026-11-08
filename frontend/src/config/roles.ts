@@ -10,13 +10,19 @@ export function formatRole(roleName: string): string {
 }
 
 /**
- * Roles allowed to mutate the import lifecycle (upload, map, process).
+ * Roles allowed to mutate finance data (import lifecycle, reconciliation runs).
  *
- * Mirrors the `ImportOperator` dependency in the backend imports router; the
- * UI hides these actions for everyone else, and the API enforces it too.
+ * Mirrors the `ImportOperator`/`ReconciliationOperator` dependencies in the
+ * backend routers; the UI hides these actions for everyone else, and the API
+ * enforces it too.
  */
-const IMPORT_OPERATOR_ROLES = new Set(['finance_executive', 'co_founder'])
+const FINANCE_OPERATOR_ROLES = new Set(['finance_executive', 'co_founder'])
 
 export function canManageImports(roleName: string): boolean {
-  return IMPORT_OPERATOR_ROLES.has(roleName)
+  return FINANCE_OPERATOR_ROLES.has(roleName)
+}
+
+/** Roles allowed to start a reconciliation run. Mirrors `ReconciliationOperator`. */
+export function canManageReconciliation(roleName: string): boolean {
+  return FINANCE_OPERATOR_ROLES.has(roleName)
 }
